@@ -1,0 +1,73 @@
+Brain Tumor Segmentation with YOLOv11 and SAM2
+
+This project uses the YOLOv11 object detection model combined with SAM2 (Segment Anything Model) to detect and segment brain tumors from MRI images. The goal is to provide both classification (tumor type) and pixel-wise segmentation masks for visual interpretation.
+
+📁 Dataset
+
+Source: Roboflow Tumor Detection Dataset (v8)
+
+Contains four tumor classes:
+
+Glioma
+
+Meningioma
+
+Pituitary
+
+No Tumor
+
+⚙️ Environment Setup
+
+Note: This project was run on CPU, not CUDA/GPU.
+
+1. Install PyTorch (CPU)
+
+Visit: https://pytorch.org/get-started/locally
+
+Or install directly:
+
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+2. Install Ultralytics
+
+pip install ultralytics
+
+🚀 Running the Code
+
+Load YOLO model (already trained on tumor dataset):
+
+from ultralytics import YOLO
+model = YOLO("path/to/best.pt")
+
+Run predictions:
+
+results = model("path/to/images")
+
+Load SAM2 and apply segmentation masks:
+
+from ultralytics import SAM
+sam_model = SAM("sam2_b.pt")
+
+for i, result in enumerate(results):
+    boxes = result.boxes.xyxy
+    sam_results_list = sam_model(result.orig_img, bboxes=boxes, verbose=False, save=True, device="cpu")
+    for j, sam_result in enumerate(sam_results_list):
+        mask = sam_result.masks.data[0].cpu().numpy().astype('uint8') * 255
+        # Save or process mask
+
+🧠 Output
+
+Classification and bounding boxes from YOLOv11
+
+Pixel-level masks from SAM2
+
+Segmented images are saved to the working directory
+
+📝 Author
+
+Syed Daniyal Haider NaqviComputer Science Student — COMSATS University Islamabad
+
+🔗 License
+
+This project is for academic and research purposes.
+
